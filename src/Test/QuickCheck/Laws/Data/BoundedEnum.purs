@@ -28,7 +28,7 @@ checkBoundedEnum
   ⇒ Ord a
   ⇒ Proxy a
   → QC eff Unit
-checkBoundedEnum _ = do
+checkBoundedEnum p = do
 
   log "Checking 'succ' law for BoundedEnum"
   quickCheck' 1 succLaw
@@ -54,7 +54,6 @@ checkBoundedEnum _ = do
   log "Checking 'tofromenum' law for BoundedEnum"
   quickCheck' 1000 tofromenumLaw
 
-
   where
     c :: Int
     c = unwrap (cardinality :: Cardinality a)
@@ -74,10 +73,10 @@ checkBoundedEnum _ = do
     succpredLaw a = a == top || (succ a >>= pred) == Just a
 
     enumpredLaw :: a -> Boolean
-    enumpredLaw a = a == bottom || (fromEnum <$> pred a) == Just (fromEnum a - 1)
-    
+    enumpredLaw a = a == bottom || (fromEnum <$> pred a) == pred (fromEnum a)
+        
     enumsuccLaw :: a -> Boolean
-    enumsuccLaw a = a == top || (fromEnum <$> succ a) == Just (fromEnum a + 1)
+    enumsuccLaw a = a == top || (fromEnum <$> succ a) == succ (fromEnum a)
 
     compareLaw :: a -> a -> Boolean
     compareLaw a b = a `compare` b == fromEnum a `compare` fromEnum b
